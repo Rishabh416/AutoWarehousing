@@ -24,9 +24,22 @@ def generateBarcode(data):
 MODE = "SCAN"
 
 storedCodes = []
+location = ""
+tempProduct = ""
 
 if MODE == "GENERATE":
-    generateBarcode("location 04 02")
+    generateBarcode("location 0101")
+    generateBarcode("product 1234")
+    generateBarcode("product 235123")
+    generateBarcode("location 0102")
+    generateBarcode("product 1248907")
+    generateBarcode("product 18044")
+    generateBarcode("location 0201")
+    generateBarcode("product 1234152")
+    generateBarcode("product 13255634")
+    generateBarcode("location 0202")
+    generateBarcode("product 846532")
+    generateBarcode("product 89465132")
 else:
     vid = cv2.VideoCapture(3)
     while(True): 
@@ -34,30 +47,27 @@ else:
         cv2.imshow("scanner", frame)
         scanned = decode(frame)
         try:
-            scannedCode = scanned[0].data.decode('utf-8')
+            for barcodes in scanned:
+                scannedCode = barcodes.data.decode('utf-8')
             if not(scannedCode in storedCodes):
                 print(scannedCode)
                 storedCodes.append(scannedCode)
+                if "location" in scannedCode:
+                    location = scannedCode.split(" ")[1]
+                    print(location)
+                elif "product" in scannedCode:
+                    tempProduct = scannedCode.split(" ")[1]
+                    print(f"product {tempProduct} is at location {location}")
+                    response = (
+                        supabase.table("warehouse")
+                        .insert({"product": tempProduct, "location": location})
+                        .execute()
+                    )
         except:
-            print("No Barcode") 
+            # print("No Barcode") 
+            pass
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
 vid.release()
 cv2.destroyAllWindows()
-
-location = ""
-tempProduct = ""
-
-for code in storedCodes:
-    if "location" in code:
-        location = code.split(" ")[1]
-        print(location)
-    elif "product" in code:
-        tempProduct = code.split(" ")[1]
-        print(f"product {tempProduct} is at location {location}")
-        response = (
-            supabase.table("warehouse")
-            .insert({"product": tempProduct, "location": location})
-            .execute()
-        )
