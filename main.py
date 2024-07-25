@@ -42,6 +42,8 @@ if MODE == "GENERATE":
     generateBarcode("product 89465132")
 else:
     vid = cv2.VideoCapture(3)
+    vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     while(True): 
         ret, frame = vid.read()
         cv2.imshow("scanner", frame)
