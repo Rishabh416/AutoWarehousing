@@ -21,25 +21,25 @@ def generateBarcode(data):
     genCode = code128(data, writer=ImageWriter())
     genCode.save(data)
 
-MODE = "SCAN"
+MODE = "GENERATE"
 
 storedCodes = []
 location = ""
 tempProduct = ""
 
 if MODE == "GENERATE":
-    generateBarcode("location 0101")
-    generateBarcode("product 1234")
-    generateBarcode("product 235123")
-    generateBarcode("location 0102")
-    generateBarcode("product 1248907")
-    generateBarcode("product 18044")
-    generateBarcode("location 0201")
-    generateBarcode("product 1234152")
-    generateBarcode("product 13255634")
-    generateBarcode("location 0202")
-    generateBarcode("product 846532")
-    generateBarcode("product 89465132")
+    generateBarcode("l 0101")
+    generateBarcode("p 1234")
+    generateBarcode("p 235123")
+    generateBarcode("l 0102")
+    generateBarcode("p 1248907")
+    generateBarcode("p 18044")
+    generateBarcode("l 0201")
+    generateBarcode("p 1234152")
+    generateBarcode("p 13255634")
+    generateBarcode("l 0202")
+    generateBarcode("p 846532")
+    generateBarcode("p 89465132")
 else:
     vid = cv2.VideoCapture(3)
     vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
