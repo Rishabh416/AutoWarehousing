@@ -22,6 +22,7 @@ def generateBarcode(data):
     genCode.save(data)
 
 MODE = "GENERATE"
+stage = 1
 
 storedCodes = []
 location = ""
@@ -40,7 +41,7 @@ if MODE == "GENERATE":
     generateBarcode("l 0202")
     generateBarcode("p 846532")
     generateBarcode("p 89465132")
-else:
+elif MODE == "LOCATION":
     vid = cv2.VideoCapture(3)
     vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
@@ -54,17 +55,42 @@ else:
             if not(scannedCode in storedCodes):
                 print(scannedCode)
                 storedCodes.append(scannedCode)
-                if "location" in scannedCode:
+                if "l" in scannedCode:
                     location = scannedCode.split(" ")[1]
                     print(location)
-                elif "product" in scannedCode:
+                elif "p" in scannedCode:
                     tempProduct = scannedCode.split(" ")[1]
                     print(f"product {tempProduct} is at location {location}")
                     response = (
                         supabase.table("warehouse")
-                        .insert({"product": tempProduct, "location": location})
+                        .insert({"product": tempProduct, "location": location, "stage":0})
                         .execute()
                     )
+        except:
+            # print("No Barcode") 
+            pass
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+else:
+    vid = cv2.VideoCapture(3)
+    vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    while(True): 
+        ret, frame = vid.read()
+        cv2.imshow("scanner", frame)
+        scanned = decode(frame)
+        try:
+            for barcodes in scanned:
+                scannedCode = barcodes.data.decode('utf-8')
+                if "p" in scannedCode:
+                    tempProduct = scannedCode.split(" ")[1]
+                    response = (
+                        supabase.table("warehouse")
+                        .update({ "stage": stage })
+                        .eq("product", tempProduct)
+                        .execute()
+                    )
+            time.sleep(1)
         except:
             # print("No Barcode") 
             pass
