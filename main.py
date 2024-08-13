@@ -21,8 +21,8 @@ def generateBarcode(data):
     genCode = code128(data, writer=ImageWriter())
     genCode.save(data)
 
-MODE = "GENERATE"
-stage = 1
+MODE = "UPDATE"
+stage = 2
 
 storedCodes = []
 location = ""
@@ -63,7 +63,7 @@ elif MODE == "LOCATION":
                     print(f"product {tempProduct} is at location {location}")
                     response = (
                         supabase.table("warehouse")
-                        .insert({"product": tempProduct, "location": location, "stage":0})
+                        .insert({"product": tempProduct, "location": location, "stage":1})
                         .execute()
                     )
         except:
@@ -82,7 +82,7 @@ else:
         try:
             for barcodes in scanned:
                 scannedCode = barcodes.data.decode('utf-8')
-                if "p" in scannedCode:
+                if "product" in scannedCode:
                     tempProduct = scannedCode.split(" ")[1]
                     response = (
                         supabase.table("warehouse")
@@ -96,6 +96,3 @@ else:
             pass
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
-vid.release()
-cv2.destroyAllWindows()
