@@ -22,7 +22,7 @@ def generateBarcode(data):
     genCode.save(data)
 
 MODE = "UPDATE"
-stage = 2
+stage = 4
 
 storedCodes = []
 location = ""
